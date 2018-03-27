@@ -1,0 +1,9 @@
+---
+
+blackbox_exporter_publish_port: "9115"
+blackbox_exporter_image_name: "prom/blackbox-exporter"
+blackbox_exporter_container_name: "blackbox-exporter"
+#blackbox_exporter_data_directory: "/var/lib/backbox_data"
+blackbox_exporter_config_directory: "/var/lib/blackbox_data"
+monitoring_network_name: "monitoring_net"
+env: "develop"

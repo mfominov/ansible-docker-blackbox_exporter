@@ -1,0 +1,39 @@
+---
+
+- block:
+
+  - name: Edit firewalld for Alermanager port
+    firewalld:
+      port: "{{ blackbox_exporter_publish_port }}/tcp"
+      permanent: true
+      state: enabled
+    notify: restart firewalld
+
+  when: env == "develop"
+
+- name: Create blackbox_exporter config directory
+  file:
+    path: "{{ blackbox_exporter_config_directory }}"
+    state: directory
+
+- name: Copy blackbox_exporter config 
+  copy:
+    src: blackbox.yml
+    dest: "{{ blackbox_exporter_config_directory }}/blackbox.yml"
+
+- name: Start blackbox_exporter container
+  docker_container:
+    image: "{{ blackbox_exporter_image_name }}"
+    state: started
+    pull: true
+    name: "{{ blackbox_exporter_container_name }}"
+    restart_policy: unless-stopped
+    networks: 
+      - name: "{{ monitoring_network_name }}"
+    volumes:
+      - "{{ blackbox_exporter_config_directory }}/blackbox.yml:/config/blakcbox.yml"
+    ports:
+      - "{{ blackbox_exporter_publish_port }}:9115"
+    command: 
+      - '--config.file=/config/blakcbox.yml'
+
